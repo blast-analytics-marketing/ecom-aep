@@ -25,8 +25,13 @@ export const virtualPageView = (pageProps) => {
   return {
     type: VIRTUAL_PAGE_VIEW,
     payload: {
-      event: "virtual_page_view",
-      page: pageProps,
+      event: "web.webpagedetails.pageViews",
+      web: {
+        webPageDetails: {
+          name: pageProps.page_name,
+          siteSection: pageProps.page_category
+        }
+      },
     },
   }
 }
@@ -36,9 +41,15 @@ export const virtualPageView = (pageProps) => {
  */
 export const viewItemList = (products, list) => {
   const ecomObj =  {
-    items: []
+    commerce: {
+      productListViews: {
+        id: list.id,
+        name: list.name,
+      }
+    },
+    productListItems: []
   };
-  ecomObj.items = products.map((
+  ecomObj.productListItems = products.map((
     {
       name,
       id,
@@ -49,24 +60,25 @@ export const viewItemList = (products, list) => {
     index
   ) => {
     const prod =  {
-      item_id: id,
-      item_name: name,
-      currency: 'USD',
-      index,
-      item_brand: "Blast",
-      price: parseFloat(price.formatted),
-      item_variant: `${variant_groups[0]?.name}: ${variant_groups[0]?.options[0]?.name}`,
-      item_list_id: list.id,
-      item_list_name: list.name,
+      SKU: id,
+      name: name,
+      currencyCode: 'USD',
+      priceTotal: parseFloat(price.formatted),
+      selectedOptions: [
+        {
+          attribute: `${variant_groups[0]?.name}`,
+          value: `${variant_groups[0]?.options[0]?.name}`
+        }
+      ],
+      categories,
     };
-    categories.forEach((cat, i) => prod[i > 0 ? `item_category${i+1}` : 'item_category'] = cat.name);
     return prod;
   });
   return {
     type: TRACK_VIEW_ITEM_LIST,
     payload: {
-      event: "view_item_list",
-      ecommerce: ecomObj,
+      event: "commerce.productListViews",
+      ...ecomObj,
     },
   }
 }
