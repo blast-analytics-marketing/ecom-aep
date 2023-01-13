@@ -203,12 +203,6 @@ export const trackAddToCart = (product, quantity, selected_options) => {
     name: name,
     currencyCode: 'USD',
     priceTotal: parseFloat(price.formatted),
-    selectedOptions: [
-      {
-        attribute: `${variant_groups[0]?.name}`,
-        value: `${variant_groups[0]?.options[0]?.name}`
-      }
-    ],
     categories,
   };
   ecomObj.productListItems.push(prod);
@@ -240,12 +234,6 @@ export const trackRemoveFromCart = (product, quantity, selected_options) => {
     name: name,
     currencyCode: 'USD',
     priceTotal: parseFloat(price.formatted),
-    selectedOptions: [
-      {
-        attribute: `${variant_groups[0]?.name}`,
-        value: `${variant_groups[0]?.options[0]?.name}`
-      }
-    ],
     categories,
   };
   ecomObj.productListItems.push(prod);
