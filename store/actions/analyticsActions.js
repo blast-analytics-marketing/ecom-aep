@@ -100,7 +100,7 @@ export const trackSelectItem = (products, position, list) => {
   const ecomObj =  {
     items: []
   };
-  ecomObj.items = products.map((
+  ecomObj.productListItems = products.map((
     {
       name,
       id,
@@ -138,23 +138,33 @@ export const trackSelectItem = (products, position, list) => {
 export const trackViewItem = (product) => {
   const { name, id, price, categories, variant_groups } = product;
   const ecomObj =  {
-    items: []
+    commerce: {
+      productViews: {
+        id: id,
+        name: name,
+      }
+    },
+    productListItems: []
   };
-  const prod = {
-    item_id: id,
-    item_name: name,
-    currency: 'USD',
-    item_brand: "Blast",
-    price: parseFloat(price.formatted),
-    item_variant: `${variant_groups[0]?.name}: ${variant_groups[0]?.options[0]?.name}`,
+  const prod =  {
+    SKU: id,
+    name: name,
+    currencyCode: 'USD',
+    priceTotal: parseFloat(price.formatted),
+    selectedOptions: [
+      {
+        attribute: `${variant_groups[0]?.name}`,
+        value: `${variant_groups[0]?.options[0]?.name}`
+      }
+    ],
+    categories,
   };
-  categories.forEach((cat, i) => prod[i > 0 ? `item_category${i+1}` : 'item_category'] = cat.name);
-  ecomObj.items.push(prod);
+  ecomObj.productListItems.push(prod);
   return {
     type: TRACK_VIEW_ITEM,
     payload: {
-      event: "view_item",
-      ecommerce: ecomObj,
+      event: "commerce.productViews",
+      ...ecomObj,
     },
   }
 }
@@ -180,24 +190,33 @@ export const trackAddToCart = (product, quantity, selected_options) => {
     variant = createVariantFromGroups(selected_options);
   }
   const ecomObj =  {
-    items: []
+    commerce: {
+      productListAdds: {
+        id: id,
+        name: name,
+      }
+    },
+    productListItems: []
   };
-  const prod = {
-    item_id: id,
-    item_name: name,
-    currency: 'USD',
-    item_brand: "Blast",
-    price: parseFloat(price.formatted),
-    item_variant: variant,
-    quantity
+  const prod =  {
+    SKU: id,
+    name: name,
+    currencyCode: 'USD',
+    priceTotal: parseFloat(price.formatted),
+    selectedOptions: [
+      {
+        attribute: `${variant_groups[0]?.name}`,
+        value: `${variant_groups[0]?.options[0]?.name}`
+      }
+    ],
+    categories,
   };
-  categories.forEach((cat, i) => prod[i > 0 ? `item_category${i+1}` : 'item_category'] = cat.name);
-  ecomObj.items.push(prod);
+  ecomObj.productListItems.push(prod);
   return {
     type: TRACK_ADD_TO_CART,
     payload: {
-      event: "add_to_cart",
-      ecommerce: ecomObj,
+      event: "comerce.productListAdds",
+      ...ecomObj,
     },
   }
 }
