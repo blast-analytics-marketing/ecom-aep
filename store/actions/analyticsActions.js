@@ -44,7 +44,7 @@ export const viewItemList = (products, list) => {
     commerce: {
       productListViews: {
         id: list.id,
-        name: list.name,
+        value: list.name,
       }
     },
     productListItems: []
@@ -141,7 +141,7 @@ export const trackViewItem = (product) => {
     commerce: {
       productViews: {
         id: id,
-        name: name,
+        value: name,
       }
     },
     productListItems: []
@@ -193,7 +193,7 @@ export const trackAddToCart = (product, quantity, selected_options) => {
     commerce: {
       productListAdds: {
         id: id,
-        name: name,
+        value: name,
       }
     },
     productListItems: []
@@ -224,7 +224,7 @@ export const trackRemoveFromCart = (product, quantity, selected_options) => {
     commerce: {
       productListRemovals: {
         id: id,
-        name: name,
+        value: name,
       }
     },
     productListItems: []
@@ -293,7 +293,7 @@ export const trackBeginCheckout = (products, cart_id) => {
     commerce: {
       checkouts: {
         id: cart_id,
-        name: "Begin Checkout",
+        value: "Begin Checkout",
       }
     },
     productListItems: []
@@ -341,7 +341,7 @@ export const trackAddShippingInfo = (products, cart_id, shipping_tier) => {
     commerce: {
       checkouts: {
         id: cart_id,
-        name: "Add Shipping Info",
+        value: "Add Shipping Info",
         shipping_tier: `${description} - ${price.formatted_with_code}`,
       }
     },
@@ -389,7 +389,7 @@ export const trackAddPaymentInfo = (products, cart_id) => {
     commerce: {
       checkouts: {
         id: cart_id,
-        name: "Add Payment Info",
+        value: "Add Payment Info",
       }
     },
     productListItems: []
