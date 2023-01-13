@@ -215,7 +215,7 @@ export const trackAddToCart = (product, quantity, selected_options) => {
   return {
     type: TRACK_ADD_TO_CART,
     payload: {
-      event: "comerce.productListAdds",
+      event: "commerce.productListAdds",
       ...ecomObj,
     },
   }
