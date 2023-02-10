@@ -43,7 +43,7 @@ export const viewItemList = (products, list) => {
   const ecomObj =  {
     commerce: {
       productListViews: {
-        id: list.id,
+        //id: list.id,
         name: list.name,
         value: 1,
       }
@@ -98,9 +98,17 @@ export const trackViewItemList = (products, list) => (dispatch) => {
  * Send the select item, product data
  */
 export const trackSelectItem = (products, position, list) => {
-  const ecomObj =  {
-    items: []
-  };
+  const ecomObj = {
+    commerce: {
+      productClicks: {
+        //id: products[0].id,
+        list_id: list.id,
+        list_name: list.name,
+        value: 1
+      }
+    },
+    productListItems: []
+  }
   ecomObj.productListItems = products.map((
     {
       name,
@@ -110,25 +118,28 @@ export const trackSelectItem = (products, position, list) => {
       variant_groups,
     }
   ) => {
+
     const prod =  {
-      item_id: id,
-      item_name: name,
-      currency: 'USD',
-      index: position,
-      item_brand: "Blast",
-      price: parseFloat(price.formatted),
-      item_variant: `${variant_groups[0]?.name}: ${variant_groups[0]?.options[0]?.name}`,
-      item_list_id: list.id,
-      item_list_name: list.name,
+      SKU: id,
+      name: name,
+      currencyCode: 'USD',
+      priceTotal: parseFloat(price.formatted),
+      selectedOptions: [
+        {
+          attribute: `${variant_groups[0]?.name}`,
+          value: `${variant_groups[0]?.options[0]?.name}`
+        }
+      ],
+      categories,
     };
-    categories.forEach((cat, i) => prod[i > 0 ? `item_category${i+1}` : 'item_category'] = cat.name);
     return prod;
   });
+  
   return {
     type: TRACK_SELECT_ITEM,
     payload: {
-      event: "select_item",
-      ecommerce: ecomObj,
+      event: "commerce.productClicks",
+      ...ecomObj,
     },
   }
 }
@@ -141,7 +152,7 @@ export const trackViewItem = (product) => {
   const ecomObj =  {
     commerce: {
       productViews: {
-        id: id,
+        //id: id,
         name: name,
         value: 1,
       }
@@ -194,7 +205,7 @@ export const trackAddToCart = (product, quantity, selected_options) => {
   const ecomObj =  {
     commerce: {
       productListAdds: {
-        id: id,
+        //id: id,
         name: name,
         value: 1,
       }
@@ -227,7 +238,7 @@ export const trackRemoveFromCart = (product, quantity, selected_options) => {
   const ecomObj =  {
     commerce: {
       productListRemovals: {
-        id: id,
+        //id: id,
         name: name,
         value: 1,
       }
