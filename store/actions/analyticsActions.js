@@ -206,6 +206,7 @@ export const trackAddToCart = (product, quantity, selected_options) => {
     name: name,
     currencyCode: 'USD',
     priceTotal: parseFloat(price.formatted),
+    quantity: quantity,
     categories,
   };
   ecomObj.productListItems.push(prod);
@@ -238,6 +239,7 @@ export const trackRemoveFromCart = (product, quantity, selected_options) => {
     name: name,
     currencyCode: 'USD',
     priceTotal: parseFloat(price.formatted),
+    quantity: quantity,
     categories,
   };
   ecomObj.productListItems.push(prod);
@@ -308,16 +310,17 @@ export const trackBeginCheckout = (products, cart_id) => {
       name,
       id,
       price,
+      quantity,
       categories,
       variant_groups,
-    },
-    index
+    }
   ) => {
     const prod =  {
       SKU: id,
       name: name,
       currencyCode: 'USD',
       priceTotal: parseFloat(price.formatted),
+      quantity: quantity,
       selectedOptions: [
         {
           attribute: `${variant_groups[0]?.name}`,
@@ -358,16 +361,17 @@ export const trackAddShippingInfo = (products, cart_id, shipping_tier) => {
       name,
       id,
       price,
+      quantity,
       categories,
       variant_groups,
-    },
-    index
+    }
   ) => {
     const prod =  {
       SKU: id,
       name: name,
       currencyCode: 'USD',
       priceTotal: parseFloat(price.formatted),
+      quantity: quantity,
       selectedOptions: [
         {
           attribute: `${variant_groups[0]?.name}`,
@@ -406,16 +410,17 @@ export const trackAddPaymentInfo = (products, cart_id) => {
       name,
       id,
       price,
+      quantity,
       categories,
       variant_groups,
-    },
-    index
+    }
   ) => {
     const prod =  {
       SKU: id,
       name: name,
       currencyCode: 'USD',
       priceTotal: parseFloat(price.formatted),
+      quantity: quantity,
       selectedOptions: [
         {
           attribute: `${variant_groups[0]?.name}`,
@@ -439,22 +444,29 @@ export const trackAddPaymentInfo = (products, cart_id) => {
  * Send the purchase, product data
  */
 export const trackPurchase = (products, orderReceipt) => {
-  const ecomObj =  {
-    currency: 'USD',
-    value: parseFloat(orderReceipt.order_value.formatted),
-    coupon: orderReceipt.order.discount.code,
-    payment_type: orderReceipt.transactions.map(trans => {
-      return trans.payment_source.brand
-    }).sort().join(),
-    shipping_tier: `${orderReceipt.order.shipping.description} - ${orderReceipt.order.shipping.price.formatted}`,
-    transaction_id: orderReceipt.id,
-    affiliation: orderReceipt.merchant.business_name,
-    tax: parseFloat(orderReceipt.tax.amount.formatted),
-    shipping: parseFloat(orderReceipt.order.shipping.price.formatted),
-    cart_id: orderReceipt.cart_id,
-    items: []
-  };
-  ecomObj.items = products.map((
+  console.log('orderReceipt', orderReceipt);
+  const ecomObj = {
+    commerce: {
+      purchases: {
+        id: orderReceipt.id,
+        value: 1,
+      },
+      order: {
+        payments: orderReceipt.transactions.map(trans => {
+          return {
+            currencyCode: 'USD',
+            paymentAmount: parseFloat(trans.amount.formatted),
+            paymentType: trans.payment_source_type,
+            transactionID: trans.id
+          }
+        }),
+        currencyCode: 'USD',
+        priceTotal: parseFloat(orderReceipt.order_value.formatted),
+        purchaseID: orderReceipt.id,
+      }
+    }
+  }
+  ecomObj.productListItems = products.map((
     {
       name,
       id,
@@ -465,22 +477,26 @@ export const trackPurchase = (products, orderReceipt) => {
     }
   ) => {
     const prod =  {
-      item_id: id,
-      item_name: name,
-      currency: 'USD',
-      item_brand: "Blast",
-      price: parseFloat(price.formatted),
-      item_variant: selected_options.map(({group_name, option_name}) => `${group_name}: ${option_name}`).sort().join(),
-      quantity
+      SKU: id,
+      name: name,
+      currencyCode: 'USD',
+      priceTotal: parseFloat(price.formatted),
+      quantity: quantity,
+      selectedOptions: [
+        {
+          attribute: `${selected_options[0]?.group_name}`,
+          value: `${selected_options[0]?.option_name}`
+        }
+      ],
+      categories,
     };
-    categories.forEach((cat, i) => prod[i > 0 ? `item_category${i+1}` : 'item_category'] = cat.name);
     return prod;
   });
   return {
     type: TRACK_PURCHASE,
     payload: {
-      event: "purchase",
-      ecommerce: ecomObj,
+      event: "commerce.purchases",
+      ...ecomObj,
     },
   }
 }
