@@ -100,11 +100,13 @@ export const trackViewItemList = (products, list) => (dispatch) => {
 export const trackSelectItem = (products, position, list) => {
   const ecomObj = {
     commerce: {
-      productClicks: {
-        //id: products[0].id,
-        list_id: list.id,
-        list_name: list.name,
-        value: 1
+      _blastamamerptrsd: {
+        productClicks: {
+          //id: products[0].id,
+          list_id: list.id,
+          list_name: list.name,
+          value: 1
+        }
       }
     },
     productListItems: []
