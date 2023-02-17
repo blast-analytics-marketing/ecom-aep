@@ -269,37 +269,48 @@ export const trackRemoveFromCart = (product, quantity, selected_options) => {
  * Send the view cart, product data
  */
 export const trackViewCart = (products, cart_id) => {
-  const ecomObj =  {
-    cart_id,
-    items: []
-  };
-  ecomObj.items = products.map((
+  const ecomObj = {
+    commerce: {
+      productListViews: {
+        value: 1
+      },
+      cart: {
+        cardID: cart_id,
+      }
+    }
+  }
+  ecomObj.productListItems = products.map((
     {
       name,
       id,
       price,
       quantity,
       categories,
-      selected_options,
-    }
+      variant_groups,
+    },
+    index
   ) => {
     const prod =  {
-      item_id: id,
-      item_name: name,
-      currency: 'USD',
-      item_brand: "Blast",
-      price: parseFloat(price.formatted),
-      item_variant: selected_options.map(({group_name, option_name}) => `${group_name}: ${option_name}`).sort().join(),
-      quantity
+      SKU: id,
+      name: name,
+      currencyCode: 'USD',
+      priceTotal: parseFloat(price.formatted),
+      quantity: quantity,
+      selectedOptions: [
+        {
+          attribute: `${selected_options[0]?.group_name}`,
+          value: `${selected_options[0]?.option_name}`
+        }
+      ],
+      categories,
     };
-    categories.forEach((cat, i) => prod[i > 0 ? `item_category${i+1}` : 'item_category'] = cat.name);
     return prod;
   });
   return {
     type: TRACK_VIEW_CART,
     payload: {
-      event: "view_cart",
-      ecommerce: ecomObj,
+      event: "commerce.productListViews",
+      ...ecomObj,
     },
   }
 }
@@ -314,6 +325,9 @@ export const trackBeginCheckout = (products, cart_id) => {
         id: cart_id,
         name: "Begin Checkout",
         value: 1,
+      },
+      cart: {
+        cartID: cart_id,
       }
     },
     productListItems: []
@@ -360,11 +374,16 @@ export const trackAddShippingInfo = (products, cart_id, shipping_tier) => {
   const { description, price } = shipping_tier;
   const ecomObj =  {
     commerce: {
-      checkouts: {
-        id: cart_id,
-        name: "Add Shipping Info",
-        value: 1,
-        shipping_tier: `${description} - ${price.formatted_with_code}`,
+      _blastamamerptrsd: {
+        addShippingInfo: {
+          value: 1,
+        }
+      },
+      shipping: {
+        shippingMethod: `${description} - ${price.formatted_with_code}`,
+      },
+      cart: {
+        cartID: cart_id,
       }
     },
     productListItems: []
@@ -398,7 +417,7 @@ export const trackAddShippingInfo = (products, cart_id, shipping_tier) => {
   return {
     type: TRACK_ADD_SHIPPING_INFO,
     payload: {
-      event: "commerce.checkouts",
+      event: "commerce.addShippingInfo",
       ...ecomObj,
     },
   }
@@ -410,10 +429,13 @@ export const trackAddShippingInfo = (products, cart_id, shipping_tier) => {
 export const trackAddPaymentInfo = (products, cart_id) => {
   const ecomObj =  {
     commerce: {
-      checkouts: {
-        id: cart_id,
-        name: "Add Payment Info",
-        value: 1,
+      _blastamamerptrsd: {
+        addPaymentInfo: {
+          value: 1,
+        }
+      },
+      cart: {
+        cartID: cart_id,
       }
     },
     productListItems: []
@@ -447,7 +469,7 @@ export const trackAddPaymentInfo = (products, cart_id) => {
   return {
     type: TRACK_ADD_PAYMENT_INFO,
     payload: {
-      event: "commerce.checkouts",
+      event: "commerce.addPaymentInfo",
       ...ecomObj,
     },
   }
